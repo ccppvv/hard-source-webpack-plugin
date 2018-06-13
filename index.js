@@ -99,8 +99,8 @@ function contextNormalModuleId(compiler, id) {
 function contextNormalLoaders(compiler, loaders) {
   return loaders.map(loader =>
     Object.assign({}, loader, {
-      loader: contextNormalPath(compiler, loader.loader),
-    }),
+      loader: contextNormalPath(compiler, loader.loader)
+    })
   );
 }
 
@@ -121,7 +121,7 @@ class HardSourceWebpackPlugin {
     let cachePath = path.resolve(
       process.cwd(),
       this.compilerOutputOptions.path,
-      dirName,
+      dirName
     );
     if (suffix) {
       cachePath = path.join(cachePath, suffix);
@@ -152,9 +152,9 @@ class HardSourceWebpackPlugin {
       options.cacheDirectory = path.resolve(
         findCacheDir({
           name: 'hard-source',
-          cwd: compiler.options.context || process.cwd(),
+          cwd: compiler.options.context || process.cwd()
         }),
-        '[confighash]',
+        '[confighash]'
       );
     }
 
@@ -175,7 +175,7 @@ class HardSourceWebpackPlugin {
       options.cacheDirectory.search(/\[confighash\]/) !== -1;
     if (configHashInDirectory && !this.configHash) {
       logMessages.configHashSetButNotUsed(compiler, {
-        cacheDirectory: options.cacheDirectory,
+        cacheDirectory: options.cacheDirectory
       });
       active = false;
 
@@ -223,21 +223,21 @@ class HardSourceWebpackPlugin {
 
     pluginCompat.register(compiler, '_hardSourceCreateSerializer', 'sync', [
       'cacheSerializerFactory',
-      'cacheDirPath',
+      'cacheDirPath'
     ]);
     pluginCompat.register(compiler, '_hardSourceResetCache', 'sync', []);
     pluginCompat.register(compiler, '_hardSourceReadCache', 'asyncParallel', [
-      'relativeHelpers',
+      'relativeHelpers'
     ]);
     pluginCompat.register(
       compiler,
       '_hardSourceVerifyCache',
       'asyncParallel',
-      [],
+      []
     );
     pluginCompat.register(compiler, '_hardSourceWriteCache', 'asyncParallel', [
       'compilation',
-      'relativeHelpers',
+      'relativeHelpers'
     ]);
 
     function runReadOrReset(_compiler) {
@@ -253,7 +253,7 @@ class HardSourceWebpackPlugin {
         mkdirp.sync(cacheAssetDirPath);
         logMessages.configHashFirstBuild(compiler, {
           cacheDirPath,
-          configHash: compiler.__hardSource_configHash,
+          configHash: compiler.__hardSource_configHash
         });
       }
       const start = Date.now();
@@ -263,7 +263,7 @@ class HardSourceWebpackPlugin {
         try {
           compilerHooks._hardSourceCreateSerializer.call(
             cacheSerializerFactory,
-            cacheDirPath,
+            cacheDirPath
           );
         } catch (err) {
           return Promise.reject(err);
@@ -277,7 +277,7 @@ class HardSourceWebpackPlugin {
 
         fsReadFile(path.join(cacheDirPath, 'version'), 'utf8').catch(() => ''),
 
-        environmentHasher.inputs ? environmentHasher.inputs() : null,
+        environmentHasher.inputs ? environmentHasher.inputs() : null
       ]).then(([stamp, hash, versionStamp, hashInputs]) => {
         if (!configHashInDirectory && options.configHash) {
           hash += `_${_this.configHash}`;
@@ -312,7 +312,7 @@ class HardSourceWebpackPlugin {
 
         logMessages.configHashBuildWith(compiler, {
           cacheDirPath,
-          configHash: compiler.__hardSource_configHash,
+          configHash: compiler.__hardSource_configHash
         });
 
         function contextKeys(compiler, fn) {
@@ -354,8 +354,8 @@ class HardSourceWebpackPlugin {
             contextNormalPath,
             contextNormalRequest,
             contextNormalModuleId,
-            copyWithDeser,
-          }),
+            copyWithDeser
+          })
         ])
           .catch(error => {
             logMessages.serialBadCache(compiler, error);
@@ -379,11 +379,11 @@ class HardSourceWebpackPlugin {
 
     compilerHooks.watchRun.tapPromise(
       'HardSource - index - readOrReset',
-      runReadOrReset,
+      runReadOrReset
     );
     compilerHooks.run.tapPromise(
       'HardSource - index - readOrReset',
-      runReadOrReset,
+      runReadOrReset
     );
 
     const detectModule = path => {
@@ -397,9 +397,9 @@ class HardSourceWebpackPlugin {
 
     const webpackFeatures = {
       concatenatedModule: detectModule(
-        'webpack/lib/optimize/ConcatenatedModule',
+        'webpack/lib/optimize/ConcatenatedModule'
       ),
-      generator: detectModule('webpack/lib/JavascriptGenerator'),
+      generator: detectModule('webpack/lib/JavascriptGenerator')
     };
 
     let schemasVersion = 2;
@@ -462,7 +462,7 @@ class HardSourceWebpackPlugin {
     new TransformAssetPlugin().apply(compiler);
 
     new TransformNormalModulePlugin({
-      schema: schemasVersion,
+      schema: schemasVersion
     }).apply(compiler);
     new TransformNormalModuleFactoryPlugin().apply(compiler);
 
@@ -479,24 +479,24 @@ class HardSourceWebpackPlugin {
     }
 
     new TransformDependencyBlockPlugin({
-      schema: schemasVersion,
+      schema: schemasVersion
     }).apply(compiler);
 
     new TransformBasicDependencyPlugin({
-      schema: schemasVersion,
+      schema: schemasVersion
     }).apply(compiler);
 
     new TransformSourcePlugin({
-      schema: schemasVersion,
+      schema: schemasVersion
     }).apply(compiler);
 
     new TransformParserPlugin({
-      schema: schemasVersion,
+      schema: schemasVersion
     }).apply(compiler);
 
     if (TransformGeneratorPlugin) {
       new TransformGeneratorPlugin({
-        schema: schemasVersion,
+        schema: schemasVersion
       }).apply(compiler);
     }
 
@@ -521,7 +521,7 @@ class HardSourceWebpackPlugin {
       const identifierPrefix = cachePrefix(compilation);
       if (identifierPrefix !== null) {
         freeze('Compilation', null, compilation, {
-          compilation,
+          compilation
         });
       }
 
@@ -532,9 +532,9 @@ class HardSourceWebpackPlugin {
             fsWriteFile(
               path.join(cacheDirPath, 'version'),
               hardSourceVersion,
-              'utf8',
-            ),
-          ]),
+              'utf8'
+            )
+          ])
         ),
         pluginCompat.promise(compiler, '_hardSourceWriteCache', [
           compilation,
@@ -545,9 +545,9 @@ class HardSourceWebpackPlugin {
 
             contextNormalPath,
             contextNormalRequest,
-            contextNormalModuleId,
-          },
-        ]),
+            contextNormalModuleId
+          }
+        ])
       ]).then(() => {
         // console.log('cache out', Date.now() - startCacheTime);
       });
